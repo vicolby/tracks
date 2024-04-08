@@ -1,0 +1,32 @@
+package main
+
+import "strconv"
+import "fmt"
+
+templ TrackProgress(track Track) {
+	<progress
+		id={ "track" + strconv.Itoa(track.ID) }
+		class="progress progress-primary w-56 mr-2"
+		value={ strconv.Itoa(track.CurrentProgress) }
+		max={ strconv.Itoa(track.MaxProgress) }
+	></progress>
+}
+
+templ Home(data TrackData) {
+	@Layout() {
+		<div id="tracks" class="flex flex-col justify-center items-center h-screen">
+			for _, item := range data.Tracks {
+				<div class="flex items-center mb-4">
+					@TrackProgress(item)
+					<button
+						class="btn btn-xs"
+						hx-post={ fmt.Sprintf("/track/%d", item.ID) }
+						hx-trigger="click"
+						hx-swap="outerHTML"
+						hx-target={ fmt.Sprintf("#track%d", item.ID) }
+					>+</button>
+				</div>
+			}
+		</div>
+	}
+}
