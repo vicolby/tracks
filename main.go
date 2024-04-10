@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
@@ -11,23 +12,23 @@ import (
 var testData = TrackData{
 	Tracks: []Track{
 		{
-            ID: 0,
-			Name:            "Learning",
-			MaxProgress:     100, // Chapters
-			CurrentProgress: 50,  // Chapters
+			ID:          0,
+			Name:        "Learning",
+			MaxProgress: 100, // Chapters
+			StartDate:   time.Now().UTC(),
 		},
-		{
-            ID: 1,
-			Name:            "Eating",
-			MaxProgress:     100, // Meals
-			CurrentProgress: 20,  // Meals
-		},
-		{
-            ID: 2,
-			Name:            "Sleeping",
-			MaxProgress:     100, // Hours
-			CurrentProgress: 60,  // Hours
-		},
+		// {
+		//           ID: 1,
+		// 	Name:            "Eating",
+		// 	MaxProgress:     100, // Meals
+		// 	CurrentProgress: 20,  // Meals
+		// },
+		// {
+		//           ID: 2,
+		// 	Name:            "Sleeping",
+		// 	MaxProgress:     100, // Hours
+		// 	CurrentProgress: 60,  // Hours
+		// },
 	},
 }
 
@@ -51,6 +52,5 @@ func HomeHandler(c echo.Context) error {
 func IncrementTrack(c echo.Context) error {
 	trackId := c.Param("id")
 	track, _ := strconv.Atoi(trackId)
-	testData.Tracks[track].CurrentProgress += 1
 	return Render(c, http.StatusOK, TrackProgress(testData.Tracks[track]))
 }
