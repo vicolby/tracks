@@ -1,41 +1,20 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
-	"strconv"
-	"time"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
-var testData = TrackData{
-	Tracks: []Track{
-		{
-			ID:          0,
-			Name:        "Learning",
-			MaxProgress: 100, // Chapters
-			StartDate:   time.Now().UTC(),
-		},
-		// {
-		//           ID: 1,
-		// 	Name:            "Eating",
-		// 	MaxProgress:     100, // Meals
-		// 	CurrentProgress: 20,  // Meals
-		// },
-		// {
-		//           ID: 2,
-		// 	Name:            "Sleeping",
-		// 	MaxProgress:     100, // Hours
-		// 	CurrentProgress: 60,  // Hours
-		// },
-	},
-}
-
 func main() {
 	app := echo.New()
-	app.GET("/", HomeHandler)
-	app.POST("/track/:id", IncrementTrack)
+
+	meetRepo := NewMeetRepository()
+	meetService := NewMeetService(meetRepo)
+	NewMeetHandler(app, meetService)
+
 	app.Logger.Fatal(app.Start(":4000"))
 }
 
@@ -45,12 +24,39 @@ func Render(ctx echo.Context, statusCode int, t templ.Component) error {
 	return t.Render(ctx.Request().Context(), ctx.Response().Writer)
 }
 
-func HomeHandler(c echo.Context) error {
-	return Render(c, http.StatusOK, Home(testData))
+type MeetHandler struct {
+	service *MeetService
 }
 
-func IncrementTrack(c echo.Context) error {
-	trackId := c.Param("id")
-	track, _ := strconv.Atoi(trackId)
-	return Render(c, http.StatusOK, TrackProgress(testData.Tracks[track]))
+func NewMeetHandler(e *echo.Echo, service *MeetService) {
+	handler := &MeetHandler{service: service}
+	e.GET("/meets", handler.GetAllMeets)
+	e.POST("/meets", handler.CreateMeet)
+}
+
+func (h *MeetHandler) GetAllMeets(c echo.Context) error {
+	meets, err := h.service.GetMeets(c.Request().Context())
+
+	if err != nil {
+		echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return Render(c, http.StatusOK, Home(meets))
+}
+
+func (h *MeetHandler) CreateMeet(c echo.Context) error {
+	meet := &Meet{}
+
+	if err := c.Bind(meet); err != nil {
+		slog.Error(err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid meet data")
+	}
+
+	err := h.service.CreateMeet(c.Request().Context(), meet)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Meet creation failed")
+	}
+
+	return c.JSON(http.StatusOK, meet)
 }

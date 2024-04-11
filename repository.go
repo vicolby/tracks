@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"sync"
 )
@@ -12,25 +13,25 @@ type MeetRepository struct {
 }
 
 func NewMeetRepository() *MeetRepository {
-	return &MeetRepository{meet: make(map[string]Meet)}
+	return &MeetRepository{meets: make(map[string]Meet)}
 }
 
-func (m *MeetRepository) CreateMeet(ctx context.Context, meet Meet) (*Meet, error) {
+func (m *MeetRepository) CreateMeet(ctx context.Context, meet *Meet) (*Meet, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	key = strconv.Itoa(meet.ID)
+	key := strconv.Itoa(meet.ID)
 
-	m.meet[key] = meet
+	m.meets[key] = *meet
 
-	return &meet, nil
+	return meet, nil
 }
 
 func (m *MeetRepository) DeleteMeet(ctx context.Context, id int) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	key = strconv.Itoa(id)
+	key := strconv.Itoa(id)
 
 	delete(m.meets, key)
 
@@ -41,7 +42,7 @@ func (m *MeetRepository) UpdateMeet(ctx context.Context, meet Meet) (*Meet, erro
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	key = strconv.Itoa(meet.ID)
+	key := strconv.Itoa(meet.ID)
 
 	m.meets[key] = meet
 
@@ -52,7 +53,7 @@ func (m *MeetRepository) GetMeet(ctx context.Context, id int) (*Meet, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	key = strconv.Itoa(id)
+	key := strconv.Itoa(id)
 
 	meet, exists := m.meets[key]
 	if !exists {
@@ -73,5 +74,5 @@ func (m *MeetRepository) GetMeets(ctx context.Context) ([]*Meet, error) {
 		meets = append(meets, &meet)
 	}
 
-	return &meets, nil
+	return meets, nil
 }

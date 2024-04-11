@@ -1,23 +1,18 @@
 package main
 
-templ TrackProgress(track Track) {
-	<div class="overflow-x-auto">
-		<ul class="steps">
-			for day := range track.MaxProgress {
-				<li class="step">{ track.StartDate.AddDate(0, 0, day).Format("Jan 2") } </li>
-			}
-		</ul>
-	</div>
+templ MeetMenu(meets []*Meet) {
+	<ul class="menu bg-base-200 w-56 rounded-box">
+		<li class="menu-title">Closest Events</li>
+		for _, meet := range meets {
+			<li><a>{ meet.Name }</a></li>
+		}
+	</ul>
 }
 
-templ Home(data TrackData) {
+templ Home(meets []*Meet) {
 	@Layout() {
-		<div id="tracks" class="flex flex-col justify-center items-center h-screen">
-			for _, item := range data.Tracks {
-				<div class="flex items-center mb-4 w-96">
-					@TrackProgress(item)
-				</div>
-			}
+		<div>
+			@MeetMenu(meets)
 		</div>
 	}
 }

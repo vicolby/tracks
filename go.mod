@@ -5,7 +5,6 @@ go 1.22.2
 require (
 	github.com/a-h/templ v0.2.598
 	github.com/labstack/echo/v4 v4.11.4
-	google.golang.org/genproto v0.0.0-20240401170217-c3f982113cda
 )
 
 require (
@@ -18,5 +17,4 @@ require (
 	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
 )
