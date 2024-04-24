@@ -1,0 +1,33 @@
+package components
+
+import (
+	"tracks/view"
+)
+
+templ NavBar() {
+	<div class="navbar bg-base-100 px-8">
+		<div class="flex-1">
+			<a class="text-xl text-primary">Tracks</a>
+		</div>
+		<div class="flex-none">
+			<ul class="menu menu-horizontal px-1">
+				if view.AuthenticatedUser(ctx).LoggedIn {
+					<li><a>Link</a></li>
+					<li>
+						<details>
+							<summary>
+								{ view.AuthenticatedUser(ctx).Email }
+							</summary>
+							<ul class="p-2 bg-base-100 rounded-t-none">
+								<li><a>Settings</a></li>
+								<li><a>Sign out</a></li>
+							</ul>
+						</details>
+					</li>
+				} else {
+					<a class="btn btn-primary">Login </a>
+				}
+			</ul>
+		</div>
+	</div>
+}
