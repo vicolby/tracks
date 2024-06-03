@@ -16,10 +16,31 @@ templ Login() {
 	}
 }
 
+templ Signup() {
+	@layout.App(false) {
+		<div class="flex items-center justify-center h-screen">
+			<div class="bg-secondary-content p-8 rounded-lg shadow-lg w-96">
+				<h1 class="text-center text-xl text-primary font-bold mb-4">Tracks</h1>
+				@SignupForm(SignupParams{}, SignupErrors{})
+			</div>
+		</div>
+	}
+}
+
 type LoginErrors struct {
 	Email              string
 	Password           string
 	InvalidCredentials string
+}
+
+type SignupErrors struct {
+	InvalidCredentials string
+}
+
+type SignupParams struct {
+	Email           string
+	Password        string
+	ConfirmPassword string
 }
 
 templ LoginForm(creds supabase.UserCredentials, errors LoginErrors) {
@@ -60,4 +81,46 @@ templ LoginForm(creds supabase.UserCredentials, errors LoginErrors) {
 		<button type="submit" class="w-full btn btn-primary mt-4">Login</button>
 		<button type="button" class="w-full btn btn-secondary mt-2">Login with Google</button>
 	</form>
+}
+
+templ SignupForm(params SignupParams, errors SignupErrors) {
+	<form hx-post="/signup" hx-swap="outerHTML">
+		<div class="w-full mb-4">
+			<input
+				type="email"
+				name="email"
+				class="input input-bordered w-full"
+				placeholder="Email"
+				value={ params.Email }
+				required
+			/>
+		</div>
+		<div class="w-full mb-4">
+			<input
+				type="password"
+				class="input input-bordered w-full max-w-xs"
+				placeholder="Password"
+				name="password"
+				required
+			/>
+		</div>
+		<div class="w-full mb-4">
+			<input
+				type="password"
+				class="input input-bordered w-full max-w-xs"
+				placeholder="Confirm Password"
+				name="password_confirm"
+				required
+			/>
+		</div>
+		if len(errors.InvalidCredentials) != 0 {
+			<div class="text-sm text-error -mt-2 -mb-2">{ errors.InvalidCredentials } </div>
+		}
+		<button type="submit" class="w-full btn btn-primary mt-4">Sign up</button>
+		<button type="button" class="w-full btn btn-secondary mt-2">Sign up with Google</button>
+	</form>
+}
+
+templ SignupConfirmation() {
+	<div class="text-center">Confirmation was sent to your email</div>
 }

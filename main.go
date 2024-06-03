@@ -25,6 +25,8 @@ func main() {
 	router.Get("/", handler.MakeHandler(handler.HandleHomeIndex))
 	router.Get("/login", handler.MakeHandler(handler.HandleLoginIndex))
 	router.Post("/login", handler.MakeHandler(handler.HandleLogin))
+	router.Get("/signup", handler.MakeHandler(handler.HandleSignUpIndex))
+	router.Post("/signup", handler.MakeHandler(handler.HandleSignup))
 
 	log.Fatal(http.ListenAndServe("localhost:3000", router))
 }
