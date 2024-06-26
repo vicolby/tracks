@@ -121,6 +121,14 @@ templ SignupForm(params SignupParams, errors SignupErrors) {
 	</form>
 }
 
+templ CallbackScript() {
+	<script>
+        var url = window.location.href
+        var newURL = url.replace("#", "?")
+        window.location = newURL
+    </script>
+}
+
 templ SignupConfirmation() {
 	<div class="text-center">Confirmation was sent to your email</div>
 }

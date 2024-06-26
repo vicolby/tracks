@@ -20,13 +20,16 @@ func main() {
 
 	}
 	router := chi.NewMux()
+	router.Use(handler.WithUser)
 
 	router.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(FS))))
 	router.Get("/", handler.MakeHandler(handler.HandleHomeIndex))
 	router.Get("/login", handler.MakeHandler(handler.HandleLoginIndex))
 	router.Post("/login", handler.MakeHandler(handler.HandleLogin))
+	router.Post("/logout", handler.MakeHandler(handler.HandleLogout))
 	router.Get("/signup", handler.MakeHandler(handler.HandleSignUpIndex))
 	router.Post("/signup", handler.MakeHandler(handler.HandleSignup))
+	router.Get("/auth/callback", handler.MakeHandler(handler.HandleAuthCallback))
 
 	log.Fatal(http.ListenAndServe("localhost:3000", router))
 }

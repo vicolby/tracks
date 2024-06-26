@@ -35,17 +35,8 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) error {
 		}).Render(r.Context(), w)
 	}
 
-	cookie := &http.Cookie{
-		Name:     "access_token",
-		Value:    resp.AccessToken,
-		MaxAge:   86400,
-		HttpOnly: true,
-		Secure:   true,
-		Path:     "/",
-	}
-
-	http.SetCookie(w, cookie)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	setAuthCookie(w, resp.AccessToken)
+	hxRedirect(w, r, "/")
 
 	return nil
 }
@@ -76,6 +67,34 @@ func HandleSignup(w http.ResponseWriter, r *http.Request) error {
 	return auth.SignupConfirmation().Render(r.Context(), w)
 }
 
+func HandleAuthCallback(w http.ResponseWriter, r *http.Request) error {
+	accessToken := r.URL.Query().Get("access_token")
+	if len(accessToken) == 0 {
+		return auth.CallbackScript().Render(r.Context(), w)
+	}
+	fmt.Println("Setting auth cook")
+	fmt.Println(accessToken)
+	setAuthCookie(w, accessToken)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	return nil
+}
+
+func HandleLogout(w http.ResponseWriter, r *http.Request) error {
+	cookie := &http.Cookie{
+		Name:     "at",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false,
+		MaxAge:   -1,
+	}
+	http.SetCookie(w, cookie)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+
+	return nil
+}
+
 func ValidateCredentials(password string, confirm string, email string) error {
 	_, err := mail.ParseAddress(email)
 	if err != nil {
@@ -89,4 +108,16 @@ func ValidateCredentials(password string, confirm string, email string) error {
 	}
 
 	return nil
+}
+
+func setAuthCookie(w http.ResponseWriter, accessToken string) {
+	cookie := &http.Cookie{
+		Name:     "at",
+		Value:    accessToken,
+		HttpOnly: true,
+		Secure:   false,
+		Path:     "/",
+	}
+
+	http.SetCookie(w, cookie)
 }
