@@ -1,0 +1,10 @@
+package settings
+
+import "tracks/types"
+import "tracks/view/layout"
+
+templ Index(user types.AuthenticatedUser) {
+	@layout.App(true) {
+		<div>Hello { user.Email } </div>
+	}
+}

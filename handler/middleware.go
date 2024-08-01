@@ -9,6 +9,23 @@ import (
 	"tracks/types"
 )
 
+func WithAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/public") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		user := GetAuthenticatedUser(r)
+		if !user.LoggedIn {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+		}
+
+		next.ServeHTTP(w, r)
+
+	})
+}
+
 func WithUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "/public") {

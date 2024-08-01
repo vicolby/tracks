@@ -31,6 +31,11 @@ func main() {
 	router.Post("/signup", handler.MakeHandler(handler.HandleSignup))
 	router.Get("/auth/callback", handler.MakeHandler(handler.HandleAuthCallback))
 
+	router.Group(func(auth chi.Router) {
+		auth.Use(handler.WithAuth)
+		auth.Get("/settings", handler.MakeHandler(handler.HandleSettingsIndex))
+	})
+
 	log.Fatal(http.ListenAndServe("localhost:3000", router))
 }
 
